@@ -26,7 +26,12 @@ Install the following packages using pip:
 
 # How to improve this work
 
+You are welcome to report bugs and suggest improvements by creating [issues]
+(https://github.com/qmisr/github_data_tutorial/issues/new)
+
+
 The main functions are in utils.py and parse_git_stats.py. You can clone this work and re-use and send a pull request for any improvements you make.
+
 You can also review the py files and add comments by clicking on the line numbers to open issues.
 
 # How to cite this work
