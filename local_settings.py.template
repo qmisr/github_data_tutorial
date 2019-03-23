@@ -1,0 +1,6 @@
+# GitHub credentials here
+# rename file to local_settings.py
+# do not share credentials publicly
+
+GITHUB_TOKEN = "***replace with your GitHub token***"
+USERNAME = "***replace with your username***"
