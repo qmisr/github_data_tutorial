@@ -1,7 +1,5 @@
 # GitHub Data Collection Tutorial
-This is a companion repository for the tutorial entitled:
-
-### The Challenges and Opportunities Mining GitHub
+You can get some background information on GitHub data from the following [tutorial](datasource.md)
 
 # Before use
 1. Make sure you have a GitHub username and get [GitHub API tokens](https://github.com/settings/tokens) (You need to sign-in with your GitHub user)
