@@ -63,10 +63,121 @@ Once the requirements are met, it is a matter of identifying the correct URL to 
 The following steps must be performed whenever data is fetched from the GitHub API:
 1.	Constructing the request
 2.	Fetching and parsing the response
-###	Constructing the Request
+### constructing-the-request)
 To construct the request, the researcher must refer to the API reference manual found at https://developer.github.com/v3/. In the column on the right, the reference provides a list of data resources that can be queried. Repositories is a likely starting point; selecting it shows the user the available actions that can be performed using the REST API as seen in the figure:
 
 ![figure 1](images/picture1.png)
+
+Of greatest interest to researchers are primarily actions that fetch data—mainly, list and get. Other actions perform operations on GitHub and are used primarily by GitHub clients and can be ignored. The list operation generally fetches a list of data items formatted as JSON objects. The get operation fetches a single data object as a JSON object as well. We have found that list actions are highly useful and offer very rich data; while get operations are highly useful when details are missing.
+
+To list the repositories owned by a user, the List user repositories link should be selected, which reveals how the API request is constructed as in the following figure: 
+
+![figure 2](images/picture2.png)
+
+To construct the request, the user needs to know the HTTP verb used, the URL path, and the required parameters. Looking at the top part of the previous figure, the URL path and an HTTP verb for fetching data from this resource are highlighted (i.e., GET /user/:username/repos). The GET part indicates that this resource is accessed using a GET HTTP verb. Most data collection using the API uses the GET verb. This means that when the requests library is used to access the API, the user will always make a get call, rather than a put or a post.
+
+The path has a username part preceded by a colon (:), indicating that the username is a placeholder. To get the correct path, the placeholder must be replaced with the GitHub username of the user whose repositories are desired. For example, to list the repositories for the GitHub user Andrew, the path will be /user/andrew/repos. The final URL of the endpoint requires that the user prepends the GitHub API hostname to the path, and, therefore, the endpoint will be api.github.com/users/andrew/repos. An attractive feature of the GitHub REST API is that if the request does not require authentication, one can open that URL in any web browser and view the JSON response from the API. This reveals a list and rich data about of all the repositories that user Andrew (in this case) is a member of.
+The bottom part of previous figure shows the optional parameters of the request. These are used to modify response behaviors such as sorting and filtering. Typically, the required parameters are made as a variable part in the URL, and the optional parameters are included in the request payload.
+
+### Parsing the Response
+Since all GitHub API responses are JSON-based, it is easy to take advantage of JSON parsing libraries in any programming language. Luckily, the requests library in Python already has that feature built in, which can be easily be taken advantage of. Every GitHub API response contains the data requested from the API in the form of a JSON object or list of objects. For example, the following is the response to the list of repositories for the user Andrew:
+
+```json
+[
+  {
+    "id": 14993753,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxNDk5Mzc1Mw==",
+    "name": "3D-contributions",
+    "full_name": "andrew/3D-contributions",
+    "private": false,
+    "owner": {
+      "login": "andrew",
+      "id": 1060,
+      "node_id": "MDQ6VXNlcjEwNjA=",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1060?v=4",
+      "gravatar_id": "",
+       ….
+      "type": "User",
+      "site_admin": false
+    },
+    "html_url": "https://github.com/andrew/3D-contributions",
+    "description": "[UNMAINTAINED] 3D print your github contributions graph",
+    "fork": false,
+    …
+    }
+]
+```
+The response is simply a list of JSON objects that can be easily parsed using any JSON parsing library. Because the response is in JSON, the structure can vary from one response to the other. Therefore, it is important to always refer to the GitHub API to see what the structure of the response will look like. In addition, the researcher can print out the response to observe how it is structured.
+The response might also contain metadata that might provide additional information to the researcher about the response, as is the case with search API responses such as the following:
+```json
+{
+  "total_count": 410,
+  "incomplete_results": false,
+  "items": [
+    {
+      "login": "kevinzhow",
+      "id": 1156192,
+      "node_id": "MDQ6VXNlcjExNTYxOTI=",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1156192?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kevinzhow",
+      "html_url": "https://github.com/kevinzhow",
+      "followers_url": "https://api.github.com/users/kevinzhow/followers",
+      "following_url": "https://api.github.com/users/kevinzhow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kevinzhow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kevinzhow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kevinzhow/subscriptions",
+      "organizations_url": "https://api.github.com/users/kevinzhow/orgs",
+      "repos_url": "https://api.github.com/users/kevinzhow/repos",
+      "events_url": "https://api.github.com/users/kevinzhow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kevinzhow/received_events",
+      "type": "User",
+      "site_admin": false,
+      "score": 1.0
+    },
+    …
+}
+
+```
+The response is a JSON object containing the following information:
+-	Total_count: the total number of users that match the search query to the API.
+-	Incomplete_result: an indication whether the result contains all the data, or partial data because the response is too big.
+-	Items: a list containing the requested data from the API.
+Because the results can have varying structures, we found the best method to parse the GitHub API responses in Python is to use the requests library to fetch and parse the response into JSON, then use json_normalize to flatten the JSON data structure into a simple Pandas DataFrame. The following is an example of how to accomplish this task:
+
+```python
+# load the required libraries
+import requests
+import pandas as pd
+from pandas.io.json import json_normalize
+
+# construct get request and fetch response
+res = requests.get("https://api.github.com/users/andrew/repos")
+
+# parse response as json, then flatten it into a dataframe
+df = json_normalize(res.json())
+
+# store the dataframe as a csv file
+df.to_csv("andrew_repos.csv")
+```
+The previous example will work for any GitHub API request, since the request and response methods are standardized. Once the response is parsed into a Pandas DataFrame, the researcher can clean and manipulate the data in Python using the Pandas Framework. Alternatively, the researcher can choose to store the data frame as a CSV file and load the data in his/her data analysis platform of choice (e.g., excel or R).
+
+### Paginated Responses
+The GitHub API responses are limited to 100 objects per request. Results that contain more than 100 objects are split over multiple pages and must be fetched over multiple requests. This method of distributing data over multiple pages is known as pagination. So, some requests require a series of request/response cycles before the researcher gets the required data. In such cases, the researcher should know how to fetch the data from the API and combine the data into a single data structure on his or her machine. Our sample data collection scripts hosted on https://github.com/qmisr/github_data_tutorial present an example of this task.   
+In addition to the JSON payload, the GitHub API responses include additional metadata in the HTTP header of the response. The header information also includes a Link header that contains hyperlinks used to navigate response pages. The Link header can look something like this:
+
+```json
+Link: <https://api.github.com/search/commits?q=%22release+1.0%22&page=2>; rel="next", <https://api.github.com/search/commits?q=%22release+1.0%22&page=34>; rel="last"
+```
+The Link header contains two hyperlinks: the first with a rel value set to next, meaning that the data should be fetched from the next page. Notice how the link contains the parameter page=2. To navigate pages, the researcher can increment the page parameter by one. The best approach, however, is to fetch the hyperlink from the Link header with rel=next to fetch the next data page.
+Notice also the link for the rel=last page, the page value in the hyperlink is set to 34, meaning that there is a total of 34 pages of data to fetch. The researcher must loop over all pages from 1 to 34 to fetch all the data in this response. Rate limiting could be a potential challenge that a researcher might face when fetching paginated responses. We recommend that authenticated requests be used so that a larger API access quota is given to the researcher. But one should keep in mind that the quota is time-based and is renewed every hour or minute depending on the API.
+A total of 60 requests per hour are allowed for unauthenticated requests, but it is possible to make 5000 authenticated requests per hour. Because the search API is more demanding, the limit in this case is set to 30 requests per minute for authenticated requests, and 10 requests per minute for unauthenticated requests. Therefore, should the researcher exceed the allotted quota, her or she must wait before issuing another request . 
+Other rel values that can be included in the Link header include first and prev. As these names suggest, first indicates the first page of the response, and prev indicates the previous page. Depending on which page the researcher requests, some rel values will be missing, information which could identify what point the researcher reached in the pages. For example, one useful fact about Link headers is that once the last page is requested, the rel=next hyperlink will no longer be available in the Link header. The researcher can use this fact to ascertain that the last page of the paginated data was reached.
+###	The Search API
+A more likely use scenario for fetching repositories is to fetch them based on some filtration criteria, and for that, the GitHub Search API is used. Some of the criteria used to search for repositories include number of forks, programming language, keywords in descriptions or README files, archived and forked repositories, and much more. The response received from the search API is a list of repositories and is  very similar in structure to the list of repositories fetched for a specific user and can be parsed in much the same way. The search API is much more useful when the researcher wants to select a sample of repositories on which to base a study. The researcher could use the list of repositories from the search results, write a script to randomly select a subset from the available list, or even combine samples from different search criteria. Furthermore, the search API is not limited to repositories alone, but can be used to search for user, commits, code, topics, issues, and pull requests. As such, it is an invaluable sampling tool for the researcher. The Search API, however, is limited in that it provides a maximum of only 1000 results, even with pagination. However, researchers can get around this limitation by combining the search results from multiple specific searches into one big data set.
+Constructing a search request is very similar to the way a list repository request is constructed, as discussed in [Constructing the Request section](#constructing-the-request). The endpoint for the search request would be https://api.github.com/search/<resource to search>/ with a required search query parameter named q. The resources that can be searched include repositories, topics, code, issues, commits, and users.
+At the very least, the q parameter should contain a single keyword to get a response. The query can also contain multiple keywords and qualifiers. The syntax requires that keywords precede all qualifiers; thus, all queries will have the syntax q=keyword1+keyword2+…keywordn+qualifier1+qualifier2+…qualifier_n. It is necessary to prepend the search API endpoint https://api.github.com/search/ before each of the following examples:
+
 
 
 # Footnotes
