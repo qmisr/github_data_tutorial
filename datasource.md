@@ -16,7 +16,7 @@ The repo URL in both formats consists of two main parts: the GitHub hostname and
 3.	git@github.com:anblandy/zero.git
 4.	git@github.com:django/django.git
 All four of these repositories are hosted on GitHub. The first three are three forks for the same project, “zero”, which belongs to three different owners: remoteinterview, 0xflotus, and anblandy. The fourth repo is an entirely different project, “django”, and is owned by the user django. When referring to a repo on GitHub, it is better to always use the owner/repo notation to identify a repository.
-### 3.1.2	Identifying Revisions
+### Identifying Revisions
 Git keeps snapshots of files in the file system and records how these change over time. Central to these changes is the concept of revision, which is a 40-character unique ID (SHA1 hash) that corresponds to a successful commit operation and identifies a specific snapshot in time. Researchers who know the revision IDs can virtually travel in time to view different versions of a file, directory, or even complete a repository. 
 To identify revisions—and extract useful meta-information—researchers can use the git log command:
 ```bash
@@ -63,7 +63,7 @@ Once the requirements are met, it is a matter of identifying the correct URL to 
 The following steps must be performed whenever data is fetched from the GitHub API:
 1.	Constructing the request
 2.	Fetching and parsing the response
-###constructing-the-request
+### Constructing the Request
 To construct the request, the researcher must refer to the API reference manual found at https://developer.github.com/v3/. In the column on the right, the reference provides a list of data resources that can be queried. Repositories is a likely starting point; selecting it shows the user the available actions that can be performed using the REST API as seen in the figure:
 
 ![figure 1](images/picture1.png)
