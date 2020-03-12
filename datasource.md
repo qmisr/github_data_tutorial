@@ -170,14 +170,82 @@ In addition to the JSON payload, the GitHub API responses include additional met
 Link: <https://api.github.com/search/commits?q=%22release+1.0%22&page=2>; rel="next", <https://api.github.com/search/commits?q=%22release+1.0%22&page=34>; rel="last"
 ```
 The Link header contains two hyperlinks: the first with a rel value set to next, meaning that the data should be fetched from the next page. Notice how the link contains the parameter page=2. To navigate pages, the researcher can increment the page parameter by one. The best approach, however, is to fetch the hyperlink from the Link header with rel=next to fetch the next data page.
+
 Notice also the link for the rel=last page, the page value in the hyperlink is set to 34, meaning that there is a total of 34 pages of data to fetch. The researcher must loop over all pages from 1 to 34 to fetch all the data in this response. Rate limiting could be a potential challenge that a researcher might face when fetching paginated responses. We recommend that authenticated requests be used so that a larger API access quota is given to the researcher. But one should keep in mind that the quota is time-based and is renewed every hour or minute depending on the API.
-A total of 60 requests per hour are allowed for unauthenticated requests, but it is possible to make 5000 authenticated requests per hour. Because the search API is more demanding, the limit in this case is set to 30 requests per minute for authenticated requests, and 10 requests per minute for unauthenticated requests. Therefore, should the researcher exceed the allotted quota, her or she must wait before issuing another request . 
+
+A total of 60 requests per hour are allowed for unauthenticated requests, but it is possible to make 5000 authenticated requests per hour. Because the search API is more demanding, the limit in this case is set to 30 requests per minute for authenticated requests, and 10 requests per minute for unauthenticated requests. Therefore, should the researcher exceed the allotted quota, her or she must wait before issuing another request<sup>[4](#myfootnote4)</sup>. 
+
 Other rel values that can be included in the Link header include first and prev. As these names suggest, first indicates the first page of the response, and prev indicates the previous page. Depending on which page the researcher requests, some rel values will be missing, information which could identify what point the researcher reached in the pages. For example, one useful fact about Link headers is that once the last page is requested, the rel=next hyperlink will no longer be available in the Link header. The researcher can use this fact to ascertain that the last page of the paginated data was reached.
 ###	The Search API
-A more likely use scenario for fetching repositories is to fetch them based on some filtration criteria, and for that, the GitHub Search API is used. Some of the criteria used to search for repositories include number of forks, programming language, keywords in descriptions or README files, archived and forked repositories, and much more. The response received from the search API is a list of repositories and is  very similar in structure to the list of repositories fetched for a specific user and can be parsed in much the same way. The search API is much more useful when the researcher wants to select a sample of repositories on which to base a study. The researcher could use the list of repositories from the search results, write a script to randomly select a subset from the available list, or even combine samples from different search criteria. Furthermore, the search API is not limited to repositories alone, but can be used to search for user, commits, code, topics, issues, and pull requests. As such, it is an invaluable sampling tool for the researcher. The Search API, however, is limited in that it provides a maximum of only 1000 results, even with pagination. However, researchers can get around this limitation by combining the search results from multiple specific searches into one big data set.
-Constructing a search request is very similar to the way a list repository request is constructed, as discussed in [Constructing the Request section](#constructing-the-request). The endpoint for the search request would be https://api.github.com/search/<resource to search>/ with a required search query parameter named q. The resources that can be searched include repositories, topics, code, issues, commits, and users.
-At the very least, the q parameter should contain a single keyword to get a response. The query can also contain multiple keywords and qualifiers. The syntax requires that keywords precede all qualifiers; thus, all queries will have the syntax q=keyword1+keyword2+…keywordn+qualifier1+qualifier2+…qualifier_n. It is necessary to prepend the search API endpoint https://api.github.com/search/ before each of the following examples:
+A more likely use scenario for fetching repositories is to fetch them based on some filtration criteria, and for that, the GitHub Search API is used. Some of the criteria used to search for repositories include number of forks, programming language, keywords in descriptions or README files, archived and forked repositories, and much more. The response received from the search API is a list of repositories and is very similar in structure to the list of repositories fetched for a specific user and can be parsed in much the same way. The search API is much more useful when the researcher wants to select a sample of repositories on which to base a study. The researcher could use the list of repositories from the search results, write a script to randomly select a subset from the available list, or even combine samples from different search criteria. Furthermore, the search API is not limited to repositories alone, but can be used to search for user, commits, code, topics, issues, and pull requests. As such, it is an invaluable sampling tool for the researcher. The Search API, however, is limited in that it provides a maximum of only 1000 results, even with pagination. However, researchers can get around this limitation by combining the search results from multiple specific searches into one big data set.
 
+Constructing a search request is very similar to the way a list repository request is constructed, as discussed in [Constructing the Request section](#constructing-the-request). The endpoint for the search request would be https://api.github.com/search/<resource to search>/ with a required search query parameter named q. The resources that can be searched include repositories, topics, code, issues, commits, and users.
+At the very least, the q parameter should contain a single keyword to get a response. The query can also contain multiple keywords and qualifiers. The syntax requires that keywords precede all qualifiers; thus, all queries will have the syntax `q=keyword1+keyword2+…keywordn+qualifier1+qualifier2+…qualifier_n`. It is necessary to prepend the search API endpoint https://api.github.com/search/ before each of the following examples:
+
+- Python repositories containing the keywords machine-learning framework:
+`repositories?q=machine+learning+framework+language:python`
+- Python, Ruby, and PHP repositories containing the keywords web framework in the README file:
+`repositories?q=web+framework+in:readme+language:ruby+language:python+language:php`
+- Commit messages containing the message “release 1.0”<sup>[5](#myfootnote5)</sup>:
+`commits?q=”release 1.0”`
+- Users that use swift programming language and have at least 100 followers:
+`users?q=+language:swift+followers:>=100`
+
+As these examples demonstrate, the query syntax can be very flexible and follows the same rules as any API request. While at times, the syntax is rich enough to construct complex queries, there are times when the researcher must fetch the results of multiple queries before obtaining the required result. To learn more about the search syntax and even how to use negative conditions (i.e. NOT), please see the GitHub search tutorial at https://help.github.com/en/articles/about-searching-on-github. 
+
+##	Scraping GitHub Web Pages
+Another form of fetching data from GitHub is extracting data that exists in the HTML of GitHub web pages. This is known as web scraping. Some websites prohibit scraping their pages as part of the terms of use of their website. GitHub permits scraping public pages for archiving services or researchers in their terms of use<sup>[6](#myfootnote6)</sup>.
+
+Scraping has two main benefits. First, it allows the researcher to circumvent the rate limitation or complexities of the API. However, with excessive bandwidth use, requests to GitHub could still be blocked. The second benefit concerns gaining access to information not available in the API, such as summaries available in the insights tab of a repository. This information might include contribution summaries, information about the top contributors during different time spans, or information about dependencies between projects<sup>[7](#myfootnote7)</sup>. Another example would be the famous GitHub contribution graph seen in users’ public profiles, as well as activity summaries<sup>[8](#myfootnote8)</sup>.
+Performing scraping is rather easy and requires knowing the structure of the HTML page. Luckily, modern browsers provide the means to easily reference the parts of the pages a researcher is interested in using XPATH, or CSS selectors, which are different standards used to programmatically select parts of an HTML page.
+
+To offer an example, we parse the summary information included in the django/django repository pulse page. The pulse page can be found at https://github.com/django/django/pulse, and if opened, the information can be seen in the middle of the page. Using a modern web browser, such as Safari, Chrome, or FireFox, the user should open the page to be scraped, then look in the menu for developer tools. When the user identifies the option to show page resources, the browser will show the underlying HTML for the page in an easy-to-navigate format. Some browsers (such as Safari) will show the HTML navigator at the bottom by default:
+
+![figure 3](images/picture3.png)
+
+ Other browsers (such as Chrome) will show it on the right side of the screen. The navigator includes a button that allows the user to select an element on the screen; the navigator will highlight the HTML for the required part:
+
+![figure 4](images/picture4.png)
+
+The user should select the HTML selector button from the navigator, select the paragraph containing the summary information to be parsed, then right-click on the highlighted HTML part in the navigator and a copy option that presents different copy options will appear. Then the user should select the copy selector or copy selector path and post this information using the correct code in Jupyter notebook to perform the parsing.
+To parse the data on the page, we use the requests-HTML library in Python<sup>[9](#myfootnote9)</sup>. It requires the selector path that we copied, and it will fetch the part from the HTML page that we highlighted. It can also navigate the HTML and extract the information needed from it using simple Python syntax. The following code fetches the HTML page and parses the data selected:
+```python
+# libraries needed
+import pandas as pd
+from requests_html import HTMLSession
+
+# use command: 'pip install nest_asyncio' in terminal or CMD, needed to fix issue in Jupyter
+import nest_asyncio
+nest_asyncio.apply()
+
+# fetch the html page
+session = HTMLSession()
+r = session.get("http://github.com/django/django/pulse")
+
+# wait for javascript to render for 2 seconds
+r.html.render(sleep=2)
+
+# This is the copied selector
+copied_sel = "#js-repo-pjax-container > div.container.new-discussion-timeline.experiment-repo-nav > div.repository-content > div > div.col-9 > div.authors-and-code > div.section.diffstat-summary.v-align-top.pt-3.js-pulse-contribution-data > div"
+
+# parse the HTML to get the selected part
+html_data = r.html.find(copied_sel, first=True)
+
+# fetch all the HTML text that is tagged as strong
+# here we used list comprehensions from python
+text_data = [x.text for x in html_data.find("strong")]
+print(text_data)
+# result:
+#     ['9 authors have pushed',
+#     '13 commits to master and',
+#     '26 commits to all branches. On master,',
+#     '42 files have changed and there have been',
+#     '635',
+#     'additions and',
+#     '340',
+#     'deletions']
+```
+The code also extracts the text that was tagged <strong>. The variable text_data contains a list of all the text that was tagged as strong and can be programmatically traversed to select the data that we need. The contents of text_data are also shown at the bottom of Table 6.
 
 
 # Footnotes
@@ -185,8 +253,20 @@ At the very least, the q parameter should contain a single keyword to get a resp
 
 <a name="myfootnote2">[2]</a>: We would highly encourage the reader to get more familiar with how developers use Git to better make use of the data it makes available. Since this is an introductory tutorial, we will refer the reader to https://git-scm.com/book/en/v2/Git-Basics-Tagging for more information on tagging, and https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging for more information on branching.
 
+<a name="myfootnote6">[4]</a>: The response header contains information about rate limiting, see https://developer.github.com/v3/#rate-limiting. 
+
+<a name="myfootnote6">[5]</a>: Accept header for the request must be set to application/vnd.github.cleak.preview, for more details, see the Search API reference at https://developer.github.com/v3/search/#search-commits.
+
+<a name="myfootnote6">[6]</a>: See the GitHub terms of use at https://help.github.com/en/articles/github-terms-of-service#5-scraping. 
+
+<a name="myfootnote7">[7]</a>: For an example see https://github.com/django/django/pulse. 
+
+<a name="myfootnote8">[8]</a>: For example see https://github.com/timgraham. 
+
+<a name="myfootnote9">[9]</a>: See https://html.python-requests.org for requests-HTML manual.
+
 # References
 
-brooks
+```Brooks, F. P. (1975). The mythical man-month. Reading, MA: Addison-Wesley.```
 
-Birds 2009
+```Bird, C., Rigby, P. C., Barr, E. T., Hamilton, D. J., German, D. M., & Devanbu, P. (2009). The promises and perils of mining git. In Mining Software Repositories: Proceedings of the 6th IEEE International Working Conference on (pp. 1-10).```
