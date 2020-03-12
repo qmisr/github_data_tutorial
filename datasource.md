@@ -249,21 +249,21 @@ The code also extracts the text that was tagged <strong>. The variable text_data
 
 
 # Footnotes
-<a name="myfootnote1">[1]</a>: The complete git log reference can be found at https://git-scm.com/docs/git-log and the pretty format syntax to customize the log output is described at https://git-scm.com/docs/pretty-formats.
+<a name="myfootnote1">1</a>: The complete git log reference can be found at https://git-scm.com/docs/git-log and the pretty format syntax to customize the log output is described at https://git-scm.com/docs/pretty-formats.
 
-<a name="myfootnote2">[2]</a>: We would highly encourage the reader to get more familiar with how developers use Git to better make use of the data it makes available. Since this is an introductory tutorial, we will refer the reader to https://git-scm.com/book/en/v2/Git-Basics-Tagging for more information on tagging, and https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging for more information on branching.
+<a name="myfootnote2">2</a>: We would highly encourage the reader to get more familiar with how developers use Git to better make use of the data it makes available. Since this is an introductory tutorial, we will refer the reader to https://git-scm.com/book/en/v2/Git-Basics-Tagging for more information on tagging, and https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging for more information on branching.
 
-<a name="myfootnote6">[4]</a>: The response header contains information about rate limiting, see https://developer.github.com/v3/#rate-limiting. 
+<a name="myfootnote6">4</a>: The response header contains information about rate limiting, see https://developer.github.com/v3/#rate-limiting. 
 
-<a name="myfootnote6">[5]</a>: Accept header for the request must be set to application/vnd.github.cleak.preview, for more details, see the Search API reference at https://developer.github.com/v3/search/#search-commits.
+<a name="myfootnote6">5</a>: Accept header for the request must be set to application/vnd.github.cleak.preview, for more details, see the Search API reference at https://developer.github.com/v3/search/#search-commits.
 
-<a name="myfootnote6">[6]</a>: See the GitHub terms of use at https://help.github.com/en/articles/github-terms-of-service#5-scraping. 
+<a name="myfootnote6">6</a>: See the GitHub terms of use at https://help.github.com/en/articles/github-terms-of-service#5-scraping. 
 
-<a name="myfootnote7">[7]</a>: For an example see https://github.com/django/django/pulse. 
+<a name="myfootnote7">7</a>: For an example see https://github.com/django/django/pulse. 
 
-<a name="myfootnote8">[8]</a>: For example see https://github.com/timgraham. 
+<a name="myfootnote8">8</a>: For example see https://github.com/timgraham. 
 
-<a name="myfootnote9">[9]</a>: See https://html.python-requests.org for requests-HTML manual.
+<a name="myfootnote9">9</a>: See https://html.python-requests.org for requests-HTML manual.
 
 # References
 
