@@ -63,7 +63,7 @@ Once the requirements are met, it is a matter of identifying the correct URL to 
 The following steps must be performed whenever data is fetched from the GitHub API:
 1.	Constructing the request
 2.	Fetching and parsing the response
-### #(constructing-the-request)
+###constructing-the-request
 To construct the request, the researcher must refer to the API reference manual found at https://developer.github.com/v3/. In the column on the right, the reference provides a list of data resources that can be queried. Repositories is a likely starting point; selecting it shows the user the available actions that can be performed using the REST API as seen in the figure:
 
 ![figure 1](images/picture1.png)
