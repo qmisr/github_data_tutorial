@@ -16,9 +16,9 @@ Install the following packages using pip:
 - gitpython
 
 # Examples
-- Using GitHub API in (github_api_examples)[./github_api_examples.ipynb]
-- Scrapping github.com in (github_scrapping_examples)[./github_scrapping_examples.ipynb]
-- Extracting data from Git (git_data_examples)[./git_data_examples.ipynb]
+- Using GitHub API in [github_api_examples](./github_api_examples.ipynb)
+- Scrapping github.com in [github_scrapping_examples](./github_scrapping_examples.ipynb)
+- Extracting data from Git [git_data_examples](./git_data_examples.ipynb)
 
 **Note:** you can view jupyter notebooks on GitHub!
 
